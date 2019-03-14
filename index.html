@@ -1,0 +1,32 @@
+<head>
+  <meta charset="UTF-8">
+  <title>Lógica em Programação - Trabalho 1</title>
+</head>
+<body>
+  <h1>Lógica em Programação 2019.1 - Trabalho 1</h1>
+    <b>Professor</b>: Mário Benevides
+    <br>
+    <b>Estudantes</b>: Silvia Pimpão e Vinícius Garcia
+    <br><br>
+  <div style="width: 20%; float: left;">
+    <input id="input" type="text">  
+    <br>
+    <button onClick="calculateBasedOnUserInput()">Calcular!</button>
+    <br>
+    <span id="result"></span>
+  </div>
+  <div style="width: 80%; float: left;">
+    <textarea id="database" rows="10"></textarea>
+    <br>
+    <button onClick="updateDatabaseFromInput()">Atualizar banco de dados!</button>
+    <br>
+    <span id="currentDatabase"></span>
+  </div>
+  <!--Lógica do Programa-->
+  <script type="text/javascript" src="main.js"></script>
+  <!--Funções Auxiliares de HTML-->
+  <script type="text/javascript" src="html_helper.js"></script>
+  <script>
+    updateDatabaseSpan(JSON.stringify(database, null, 2));
+  </script>
+</body>
