@@ -111,7 +111,7 @@ function calculate_input(expression) {
 
   var root_state = database.states[0];
   if (is_valid_expression(expression)) {
-    return calculate(stack, stack.length - 1, root_state);
+    return calculate(stack, stack.length - 1, root_state).value;
   }
 
   return throw_error();
@@ -128,24 +128,28 @@ function calculate(stack, index, state) {
     var operator = get_operator(character);
     
     var states_to_check = operator.states_to_check(state);
+    var deepest_index = index;
     var operation_results = [];
 
     for (let state_to_check of states_to_check) {
       var operands = []
+      var last_index = index;
       
       for (var i = 0; i < operator.length; i++) {
-        var operand = calculate(stack, index - (i + 1), state_to_check);
-        operands.push(operand);
+        var operand = calculate(stack, last_index - 1, state_to_check);
+        last_index = operand.index;
+        operands.push(operand.value);
       }
 
       var operation_result = operator.operation(operands);
       operation_results.push(operation_result);
+      deepest_index = last_index;
     }
 
-    return operator.validate_results(operation_results);
+    return {"index": deepest_index, "value": operator.validate_results(operation_results)};
   }
 
-  return get_variable_value_at_state(character, state);
+  return {"index": index, "value": get_variable_value_at_state(character, state)};
 }
 
 function get_variable_value_at_state(character, state) {
