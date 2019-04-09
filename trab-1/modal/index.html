@@ -6,24 +6,41 @@
   <body>
     <div class="p-2">
       <h1>Lógica em Programação 2019.1 - Trabalho 1</h1>
-        <h2>Lógica Modal</h2> 
-        <br>
-        <b>Professor</b>: Mário Benevides
-        <br>
-        <b>Estudantes</b>: Silvia Pimpão e Vinícius Garcia
-        <br><br>
-      <div style="width: 20%; float: left;">
-        <input id="input" type="text"> <span id="result"></span>
-        <br>
-        <button class="mt-1" onClick="calculateBasedOnUserInput()">Calcular!</button>
-        <br>
-      </div>
-      <div style="width: 80%; float: left;">
-        <textarea id="database" rows="10"></textarea>
-        <br>
-        <button onClick="updateDatabaseFromInput()">Atualizar banco de dados!</button>
-        <br>
-        <span id="currentDatabase"></span>
+      <h2>Lógica Modal</h2> 
+      <br>
+      <b>Professor</b>: Mário Benevides
+      <br>
+      <b>Estudantes</b>: Silvia Pimpão e Vinícius Garcia
+      <br>
+      <br>
+      <div class="row">
+        <div class="col-2">
+          <h4>Input</h4>
+          <input id="input" type="text">
+          <button class="mt-1" onClick="calculateBasedOnUserInput()">Calcular!</button>
+          <br>
+          <span id="result"></span>
+        </div>
+        <div class="col-6 row mx-1 px-0 bg-light">
+          <div class="col-12">
+            <h4>Banco de Dados</h4>
+          </div>
+          <div class="col-6">
+            <h5>Estados</h5>
+            <textarea class="w-100" id="states" rows="10"></textarea>
+            <br>
+            <span id="currentDatabase"></span>
+          </div>
+          <div class="col-6">
+            <h5>Transições</h5>
+            <textarea class="w-100" id="relations" rows="10"></textarea>
+            <br>
+            <span id="currentDatabase"></span>
+          </div>
+          <div class="col-12">
+            <button class="my-2" onClick="updateDatabaseFromInput()">Atualizar banco de dados!</button>
+          </div>
+        </div>
       </div>
     </div>
     <!--Lógica do Programa-->
@@ -31,6 +48,6 @@
     <!--Funções Auxiliares de HTML-->
     <script type="text/javascript" src="html_helper.js"></script>
     <script>
-      updateDatabaseSpan(JSON.stringify(database, null, 2));
+      updateDatabaseSpan(JSON.stringify(database.states, null, 4), JSON.stringify(database.relations, null, 4));
     </script>
   </body>

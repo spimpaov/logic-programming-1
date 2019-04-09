@@ -18,7 +18,6 @@ let database = {
     }
   ],
   "relations": [
-    //["a", "b"], a -> b
     ["x", "y"],
     ["x", "z"],
     ["y", "a"],
