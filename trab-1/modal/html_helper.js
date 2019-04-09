@@ -25,9 +25,37 @@ function updateDatabaseFromInput() {
   database.states = states;
   database.relations = relations;
   updateDatabaseSpan(states_input, relations_input);
+  updateGraphVisualization(database.states, database.relations);
 }
 
 function updateDatabaseSpan(states, relations) {
   document.getElementById('states').value = states;
   document.getElementById('relations').value = relations;
+}
+
+function getStateLabel(state) {
+  var string = "<b>" + state.name + "</b>: ("
+  
+  for (var i = 0; i < state.variables.length; i++) {
+    string += state.variables[i];
+    if (i < state.variables.length - 1) string += ", ";
+  }
+
+  string += ")";
+  return string;
+}
+
+function updateGraphVisualization(states, relations) {
+  var string = "graph TD\n";
+  relations.forEach((relation) => {
+    var source = get_state_by_name(relation[0]);
+    var target = get_state_by_name(relation[1]);
+
+    string += "    " + source.name + "[\"" + getStateLabel(source) + "\"] --> " + target.name + "[\"" + getStateLabel(target) + "\"]\n"
+  });
+
+  var element = document.getElementById('graph_visualization')
+  element.innerHTML = string;
+  element.removeAttribute('data-processed');
+  mermaid.init(undefined, "#graph_visualization");
 }

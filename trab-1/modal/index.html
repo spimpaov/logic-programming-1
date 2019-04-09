@@ -21,7 +21,7 @@
           <br>
           <span id="result"></span>
         </div>
-        <div class="col-6 row mx-1 px-0 bg-light">
+        <div class="col-5 row mx-1 px-0 bg-light">
           <div class="col-12">
             <h4>Banco de Dados</h4>
           </div>
@@ -41,13 +41,19 @@
             <button class="my-2" onClick="updateDatabaseFromInput()">Atualizar banco de dados!</button>
           </div>
         </div>
+        <div class="col-4 text-center">
+          <div id="graph_visualization" class="mermaid">
+          </div>
+        </div>
       </div>
     </div>
     <!--Lógica do Programa-->
     <script type="text/javascript" src="main.js"></script>
     <!--Funções Auxiliares de HTML-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.0.0/mermaid.min.js"></script>
     <script type="text/javascript" src="html_helper.js"></script>
     <script>
       updateDatabaseSpan(JSON.stringify(database.states, null, 4), JSON.stringify(database.relations, null, 4));
+      updateGraphVisualization(database.states, database.relations);
     </script>
   </body>
