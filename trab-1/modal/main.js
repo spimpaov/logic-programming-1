@@ -3,20 +3,16 @@ let database = {
     {
       "name": "x",
       "variables": ["q"]
-    },
-    {
+    }, {
       "name": "y",
       "variables": ["p", "q", "r"]
-    },
-    {
+    }, {
       "name": "z",
       "variables": ["p"]
-    },
-    {
+    }, {
       "name": "a",
       "variables": ["p", "q"]
-    },
-    {
+    }, {
       "name": "b",
       "variables": ["p"]
     }
@@ -31,10 +27,12 @@ let database = {
 }
 
 const operator = class {
-  constructor(name, string, operation, length) {
+  constructor(name, string, operation, states_to_check, validate_results, length) {
     this.name = name;
     this.string = string;
     this.operation = operation;
+    this.states_to_check = states_to_check;
+    this.validate_results = validate_results;
     this.length = length;
   }
 }
@@ -46,6 +44,8 @@ operators = [
     operation = function(p) {
       return !p[0];
     },
+    states_to_check = function(s) { return [s]; },
+    validate_results = get_first_and_only_result,
     length = 1
   ),
   new operator(
@@ -54,6 +54,8 @@ operators = [
     operation = function(p) {
       return p[0] && p[1];
     },
+    states_to_check = function(s) { return [s]; },
+    validate_results = get_first_and_only_result,
     length = 2
   ),
   new operator(
@@ -62,6 +64,8 @@ operators = [
     operation = function(p) {
       return p[0] || p[1];
     },
+    states_to_check = function(s) { return [s]; },
+    validate_results = get_first_and_only_result,
     length = 2
   ),
   new operator(
@@ -70,38 +74,45 @@ operators = [
     operation = function(p) {
       return !p[0] || p[1];
     },
+    states_to_check = function(s) { return [s]; },
+    validate_results = get_first_and_only_result,
     length = 2
   ),
   new operator(
     name = "EXISTS",
     string = "?",
-    operation = function(p) {
-      return p[0];
+    operation = function(p) { return p[0]; },
+    states_to_check = get_all_state_neighbors,
+    validate_results = function(r) {
+      var trues = r.filter((f) => f);
+      return trues.length > 0;      
     },
     length = 1
   ),
   new operator(
     name = "FOR EACH",
     string = "*",
-    operation = function(p) {
-      return p[0];
+    operation = function(p) { return p[0]; },
+    states_to_check = get_all_state_neighbors,
+    validate_results = function(r) {
+      var trues = r.filter((f) => f);
+      return trues.length == r.length;
     },
     length = 1
   )
 ]
 
 function calculate_input(expression) {
-  //Example expression = "A!B!UC!DU>"
-  var stack = []
+  // expecting expression in postfixed notation
   
+  var stack = []
   for (let character of expression) {
     stack.push(character);
   }
 
-  var initial_state_name = database.states[0].name;
-
+  var root_state = database.states[0];
   if (is_valid_expression(expression)) {
-    return calculate(stack, stack.length - 1, initial_state_name);
+    return calculate(stack, stack.length - 1, root_state);
   }
 
   return throw_error();
@@ -113,69 +124,32 @@ function calculate(stack, index, state) {
   }
 
   var character = stack[index];
-  var operand_count = 0;
   
   if (is_operator(character)) {
-    var operator = character;
-
-    var states_to_check = [state];
-
-    switch (operator) {
-      case "!":
-        operand_count = 1;
-        break;
-      case "?": case "*":
-        operand_count = 1;
-        states_to_check = get_all_state_neighbors(state);
-        break;
-      case "^": case "U": case ">":
-        operand_count = 2;
-        break;
-      default:
-        return throw_error();
-    }
-
+    var operator = get_operator(character);
+    
+    var states_to_check = operator.states_to_check(state);
     var operation_results = [];
 
     for (let state_to_check of states_to_check) {
       var operands = []
       
-      for (var i = 0; i < operand_count; i++) {
+      for (var i = 0; i < operator.length; i++) {
         var operand = calculate(stack, index - (i + 1), state_to_check);
         operands.push(operand);
       }
 
-      var operation_result = perform_operation(operator, operands);
+      var operation_result = operator.operation(operands);
       operation_results.push(operation_result);
     }
 
-    if (operation_results.length == 1) {
-      return operation_results[0];
-    }
-    else {
-      var trues = operation_results.filter((f) => f);
-      if (operator == "*") {
-        return trues.length == operation_results.length;
-      }
-      else if (operator == "?") {
-        return trues.length > 0;
-      }
-      else {
-        return throw_error();
-      }
-    }
+    return operator.validate_results(operation_results);
   }
 
-  var variable_value = get_variable_value_at_state(character, state);
-  return variable_value;
+  return get_variable_value_at_state(character, state);
 }
 
-function get_state_by_name(name) {
-  return database.states.find((f) => f.name == name);
-}
-
-function get_variable_value_at_state(character, state_name) {
-  var state = get_state_by_name(state_name);
+function get_variable_value_at_state(character, state) {
   return state.variables.find((f) => f == character) != undefined;
 }
 
@@ -187,18 +161,20 @@ function get_operator(operation) {
   return operators.find((f) => f.string == operation);
 }
 
-function perform_operation(character, operands) {
-  var operator = get_operator(character);
-  return operator.operation(operands);
+function get_state_by_name(name) {
+  return database.states.find((f) => f.name == name);
 }
 
-function throw_error() {
-  console.error("This should not be happening.");
-  return undefined;
+function get_all_state_neighbors(state) {
+  return database.relations.filter((f) => f[0] == state.name).map((f) => get_state_by_name(f[1]));
 }
 
-function get_all_state_neighbors(state_name) {
-  return database.relations.filter((f) => f[0] == state_name).map((f) => f[1]);
+function get_first_and_only_result(results) {
+  if (results.length != 1) {
+    return throw_error();
+  }
+
+  return results[0];
 }
 
 function is_valid_expression(expression) {
@@ -220,4 +196,9 @@ function is_valid_expression(expression) {
   }
 
   return counter == 1;
+}
+
+function throw_error() {
+  console.error("This should not be happening.");
+  return undefined;
 }
