@@ -26,11 +26,11 @@ let database = {
 }
 
 const operator = class {
-  constructor(name, string, operation, states_to_check, validate_results, length) {
+  constructor(name, string, operation, get_states_to_check, validate_results, length) {
     this.name = name;
     this.string = string;
     this.operation = operation;
-    this.states_to_check = states_to_check;
+    this.get_states_to_check = get_states_to_check;
     this.validate_results = validate_results;
     this.length = length;
   }
@@ -43,7 +43,7 @@ operators = [
     operation = function(p) {
       return !p[0];
     },
-    states_to_check = function(s) { return [s]; },
+    get_states_to_check = function(s) { return [s]; },
     validate_results = get_first_and_only_result,
     length = 1
   ),
@@ -53,7 +53,7 @@ operators = [
     operation = function(p) {
       return p[0] && p[1];
     },
-    states_to_check = function(s) { return [s]; },
+    get_states_to_check = function(s) { return [s]; },
     validate_results = get_first_and_only_result,
     length = 2
   ),
@@ -63,7 +63,7 @@ operators = [
     operation = function(p) {
       return p[0] || p[1];
     },
-    states_to_check = function(s) { return [s]; },
+    get_states_to_check = function(s) { return [s]; },
     validate_results = get_first_and_only_result,
     length = 2
   ),
@@ -73,7 +73,7 @@ operators = [
     operation = function(p) {
       return !p[0] || p[1];
     },
-    states_to_check = function(s) { return [s]; },
+    get_states_to_check = function(s) { return [s]; },
     validate_results = get_first_and_only_result,
     length = 2
   ),
@@ -81,7 +81,7 @@ operators = [
     name = "EXISTS",
     string = "?",
     operation = function(p) { return p[0]; },
-    states_to_check = get_all_state_neighbors,
+    get_states_to_check = get_all_state_neighbors,
     validate_results = function(r) {
       var trues = r.filter((f) => f);
       return trues.length > 0;      
@@ -92,7 +92,7 @@ operators = [
     name = "FOR EACH",
     string = "*",
     operation = function(p) { return p[0]; },
-    states_to_check = get_all_state_neighbors,
+    get_states_to_check = get_all_state_neighbors,
     validate_results = function(r) {
       var trues = r.filter((f) => f);
       return trues.length == r.length;
@@ -127,7 +127,7 @@ function calculate(stack, index, state) {
   if (is_operator(character)) {
     var operator = get_operator(character);
     
-    var states_to_check = operator.states_to_check(state);
+    var states_to_check = operator.get_states_to_check(state);
     var deepest_index = index;
     var operation_results = [];
 
