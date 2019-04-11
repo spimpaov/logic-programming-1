@@ -1,6 +1,9 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <title>Lógica em Programação - Trabalho 1</title>
   </head>
   <body>
@@ -14,34 +17,113 @@
       <br>
       <br>
       <div class="row">
-        <div class="col-2">
+        <div class="col-3">
           <h4>Input</h4>
           <input id="input" type="text">
           <button class="mt-1" onClick="calculateBasedOnUserInput()">Calcular!</button>
           <br>
           <span id="result"></span>
-        </div>
-        <div class="col-5 row mx-1 px-0 bg-light">
-          <div class="col-12">
-            <h4>Banco de Dados</h4>
-          </div>
-          <div class="col-6">
-            <h5>Estados</h5>
-            <textarea class="w-100" id="states" rows="10"></textarea>
+          <br>
+          <br>
+          
+          <a class="btn btn-primary" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">
+            <span class="font-weight-bold">Visualizar ajuda</span>
+          </a>
+
+          <br>
+
+          <div class="collapse multi-collapse" id="multiCollapseExample1">
             <br>
-            <span id="currentDatabase"></span>
-          </div>
-          <div class="col-6">
-            <h5>Transições</h5>
-            <textarea class="w-100" id="relations" rows="10"></textarea>
+            <small>A notação utilizada para input é a pós-fixada!</small>
             <br>
-            <span id="currentDatabase"></span>
-          </div>
-          <div class="col-12">
-            <button class="my-2" onClick="updateDatabaseFromInput()">Atualizar banco de dados!</button>
+            <table class="table">
+              <thead>
+                <th scope="col">Símbolo</th>
+                <th scope="col">Caractere Correspondente</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>¬</td>
+                  <td>!</td>
+                </tr>
+                <tr>
+                  <td>∧</td>
+                  <td>^</td>
+                </tr>
+                <tr>
+                  <td>∨</td>
+                  <td>U</td>
+                </tr>
+                <tr>
+                  <td>→</td>
+                  <td>></td>
+                </tr>
+                <tr>
+                  <td>□</td>
+                  <td>*</td>
+                </tr>
+                <tr>
+                  <td>◇</td>
+                  <td>?</td>
+                </tr>
+              </tbody>
+              <thead>
+                <th scope="col">Expressão</th>
+                <th scope="col">Input Correspondente</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>¬p</td>
+                  <td>p!</td>
+                </tr>
+                <tr>
+                  <td>p ∧ q</td>
+                  <td>qp^</td>
+                </tr>
+                <tr>
+                  <td>p → q</td>
+                  <td>qp></td>
+                </tr>
+                <tr>
+                  <td>(p ∨ ¬r) → q</td>
+                  <td>qr!pU></td>
+                </tr>
+                <tr>
+                  <td>□(◇p)</td>
+                  <td>p?*</td>
+                </tr>
+                <tr>
+                  <td>□p → □□p</td>
+                  <td>p**p*></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="col-4 text-center">
+        
+        <div class="col-4">
+          <div class="row">
+            <div class="col-12">
+              <h4>Banco de Dados</h4>
+            </div>
+            <div class="col-6">
+              <h5>Estados</h5>
+              <textarea class="w-100" id="states" rows="10"></textarea>
+              <br>
+              <span id="currentDatabase"></span>
+            </div>
+            <div class="col-6">
+              <h5>Transições</h5>
+              <textarea class="w-100" id="relations" rows="10"></textarea>
+              <br>
+              <span id="currentDatabase"></span>
+            </div>
+            <div class="col-12">
+              <button class="my-2" onClick="updateDatabaseFromInput()">Atualizar banco de dados!</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 text-center">
           <div id="graph_visualization" class="mermaid">
           </div>
         </div>
