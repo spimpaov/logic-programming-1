@@ -1,0 +1,8 @@
+#result {
+    opacity: 0;
+}
+
+.animatee {
+    opacity: 1 !important;
+    transition: opacity 0.1s ease 0s;
+}

@@ -15,6 +15,7 @@ function calculateBasedOnUserInput() {
   }
 
   document.getElementById('result').textContent = output;
+  handleFadeInEffect();
 }
 
 function updateDatabaseFromInput() {
@@ -65,4 +66,11 @@ function updateGraphVisualization(states, relations) {
   element.innerHTML = string;
   element.removeAttribute('data-processed');
   mermaid.init(undefined, "#graph_visualization");
+}
+
+function handleFadeInEffect() {
+  document.getElementById('result').className = "";
+  setTimeout(function() {
+    document.getElementById('result').classList.add("animatee");
+  }, 100);
 }

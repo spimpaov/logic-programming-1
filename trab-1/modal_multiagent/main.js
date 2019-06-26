@@ -26,62 +26,68 @@ let database = {
 }
 
 const operator = class {
-  constructor(name, string, operation, get_states_to_check, validate_results, length) {
+  constructor(name, pattern, operation, get_states_to_check, get_agent, validate_results, length) {
     this.name = name;
-    this.string = string;
+    this.pattern = pattern;
     this.operation = operation;
     this.get_states_to_check = get_states_to_check;
     this.validate_results = validate_results;
     this.length = length;
+    this.get_agent = get_agent;
   }
 }
 
 operators = [
   new operator(
     name = "NOT",
-    string = "!",
+    pattern = /\!/,
     operation = function(p) {
       return !p[0];
     },
-    get_states_to_check = function(s) { return [s]; },
+    get_states_to_check = get_current_state,
+    get_agent = function(s) { return undefined },
     validate_results = get_first_and_only_result,
     length = 1
   ),
   new operator(
     name = "AND",
-    string = "^",
+    pattern = /\^/,
     operation = function(p) {
       return p[0] && p[1];
     },
-    get_states_to_check = function(s) { return [s]; },
+    get_states_to_check = get_current_state,
+    get_agent = function(s) { return undefined },
     validate_results = get_first_and_only_result,
     length = 2
   ),
   new operator(
     name = "OR",
-    string = "U",
+    pattern = /\U/,
     operation = function(p) {
       return p[0] || p[1];
     },
-    get_states_to_check = function(s) { return [s]; },
+    get_states_to_check = get_current_state,
+    get_agent = function(s) { return undefined },
     validate_results = get_first_and_only_result,
     length = 2
   ),
   new operator(
     name = "IMPLIES",
-    string = ">",
+    pattern = /\>/,
     operation = function(p) {
       return !p[0] || p[1];
     },
-    get_states_to_check = function(s) { return [s]; },
+    get_states_to_check = get_current_state,
+    get_agent = function(s) { return undefined },
     validate_results = get_first_and_only_result,
     length = 2
   ),
   new operator(
     name = "EXISTS",
-    string = "?",
+    pattern = /\{\?\w\}/,
     operation = function(p) { return p[0]; },
     get_states_to_check = get_all_state_neighbors,
+    get_agent = function(string) { return string.match(/\w/)[0] },
     validate_results = function(r) {
       var trues = r.filter((f) => f);
       return trues.length > 0;      
@@ -90,9 +96,10 @@ operators = [
   ),
   new operator(
     name = "FOR EACH",
-    string = "*",
+    pattern = /\{\*\w\}/,
     operation = function(p) { return p[0]; },
     get_states_to_check = get_all_state_neighbors,
+    get_agent = function(string) { return string.match(/\w/)[0] },
     validate_results = function(r) {
       var trues = r.filter((f) => f);
       return trues.length == r.length;
@@ -102,7 +109,7 @@ operators = [
 ]
 
 function calculate_input(expression) {
-  // expecting expression in postfixed notation
+  // Expecting expression in postfixed notation
   
   var stack = []
   for (let character of expression) {
@@ -110,7 +117,7 @@ function calculate_input(expression) {
   }
 
   var root_state = database.states[0];
-  if (is_valid_expression(expression)) {
+  if (is_valid_expression(stack)) {
     return calculate(stack, stack.length - 1, root_state).value;
   }
 
@@ -122,12 +129,14 @@ function calculate(stack, index, state) {
     return throw_error();
   }
 
-  var character = stack[index];
+  var op_string_obj = get_op_string(stack, index, forwards = false);
+  var op_string = op_string_obj.op_string;
+  index = op_string_obj.new_index;
   
-  if (is_operator(character)) {
-    var operator = get_operator(character);
+  if (is_operator(op_string)) {
+    var operator = get_operator(op_string);
     
-    var states_to_check = operator.get_states_to_check(state);
+    var states_to_check = operator.get_states_to_check(state, operator.get_agent(op_string));
     var deepest_index = index;
     var operation_results = [];
 
@@ -149,11 +158,11 @@ function calculate(stack, index, state) {
     return {"index": deepest_index, "value": operator.validate_results(operation_results)};
   }
 
-  return {"index": index, "value": get_variable_value_at_state(character, state)};
+  return {"index": index, "value": get_variable_value_at_state(op_string, state)};
 }
 
-function get_variable_value_at_state(character, state) {
-  return state.variables.find((f) => f == character) != undefined;
+function get_variable_value_at_state(op_string, state) {
+  return state.variables.find((f) => f == op_string) != undefined;
 }
 
 function is_operator(operation) {
@@ -161,15 +170,50 @@ function is_operator(operation) {
 }
 
 function get_operator(operation) {
-  return operators.find((f) => f.string == operation);
+  return operators.find((f) => operation.search(f.pattern) != -1);
+}
+
+// 'op string' purposefully ambiguous to mean both 'operator string' and 'operand string'
+function get_op_string(array, index, forwards = true) {
+  var op_string = array[index];
+
+  var index_start_char = index;
+  var index_end_char = index;
+
+  // Sometimes, the operator spans more than one character (e.g. '{?a}').
+  // This snippet guarantees that we will return the whole operator, instead of only the first character.
+  if (forwards) {
+    if (op_string == "{") {
+      var i = 0;
+      for (i = index_start_char; i < array.length && array[i] != "}"; i++);
+      index_end_char = i;
+      index = index_end_char;
+    }
+  } else /*backwards*/ {
+    if (op_string == "}") {
+      var i = 0;
+      for (i = index_end_char; i >= 0 && array[i] != "{"; i--);
+      index_start_char = i;
+      index = index_start_char;
+    }
+  }
+  
+  op_string = array.slice(index_start_char, index_end_char + 1).join("");
+  return {"op_string": op_string, "new_index": index};
 }
 
 function get_state_by_name(name) {
   return database.states.find((f) => f.name == name);
 }
 
-function get_all_state_neighbors(state) {
-  return database.relations.filter((f) => f[0] == state.name).map((f) => get_state_by_name(f[1]));
+function get_current_state(current_state, agent) {
+  return [current_state];
+}
+
+function get_all_state_neighbors(current_state, agent) {
+  return database.relations
+    .filter((f) => f.source == current_state.name && f.agents.includes(agent))
+    .map((f) => get_state_by_name(f.target));
 }
 
 function get_first_and_only_result(results) {
@@ -184,12 +228,14 @@ function is_valid_expression(expression) {
   var counter = 0;
 
   for (var i = 0; i < expression.length; i++) {
-    var character = expression[i];
+    var op_string_obj = get_op_string(expression, i, forwards = true);
+    var op_string = op_string_obj.op_string;
+    i = op_string_obj.new_index;
     
-    if (is_operator(character)) {
-      var operator = get_operator(character);
+    if (is_operator(op_string)) {
+      var operator = get_operator(op_string);
       counter -= operator.length;
-
+      
       if (counter < 0) {
         return false;
       }

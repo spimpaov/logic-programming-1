@@ -3,12 +3,18 @@ function calculateBasedOnUserInput() {
   var output = result;
 
   if (result != null && result != undefined) {
-    output = result;
+    if (result) {
+      output = "✓ "
+    } else {
+      output = "✗ "
+    }
+    output += result + "!";
   } else {
-    output = "Valor indefinido.";
+    output = "✗ Valor indefinido!";
   }
 
   document.getElementById('result').textContent = output;
+  handleFadeInEffect();
 }
 
 function updateDatabaseFromInput() {
@@ -18,5 +24,12 @@ function updateDatabaseFromInput() {
 }
 
 function updateDatabaseSpan(string) {
-  document.getElementById('currentDatabase').textContent = string;
+  document.getElementById('database').textContent = string;
+}
+
+function handleFadeInEffect() {
+  document.getElementById('result').className = "";
+  setTimeout(function() {
+    document.getElementById('result').classList.add("animatee");
+  }, 100);
 }
