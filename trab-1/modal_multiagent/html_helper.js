@@ -49,10 +49,17 @@ function getStateLabel(state) {
 function updateGraphVisualization(states, relations) {
   var string = "graph TD\n";
   relations.forEach((relation) => {
-    var source = get_state_by_name(relation[0]);
-    var target = get_state_by_name(relation[1]);
+    var source = get_state_by_name(relation.source);
+    var target = get_state_by_name(relation.target);
 
-    string += "    " + source.name + "[\"" + getStateLabel(source) + "\"] --> " + target.name + "[\"" + getStateLabel(target) + "\"]\n"
+    var agents = relation.agents;
+    var agents_string = agents.join(", ");
+    //To fix a certain visualization bug
+    for (var i = 1; i < agents.length; i++) {
+      agents_string += "·";
+    }
+    
+    string += "    " + source.name + "[\"" + getStateLabel(source) + "\"] -->|\"" + agents_string + "\"| " + target.name + "[\"" + getStateLabel(target) + "\"]\n"
   });
 
   var element = document.getElementById('graph_visualization')

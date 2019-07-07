@@ -1,6 +1,7 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="../../styles.css">
   <title>Lógica em Programação - Trabalho 1</title>
 </head>
 <body>
@@ -13,17 +14,76 @@
       <b>Estudantes</b>: Silvia Pimpão e Vinícius Garcia
       <br><br>
     <div style="width: 20%; float: left;">
-      <input id="input" type="text"> <span id="result"></span>
+      <h4>Input</h4>
+      <input id="input" type="text">
       <br>
       <button class="mt-1" onClick="calculateBasedOnUserInput()">Calcular!</button>
       <br>
+      <span id="result"></span>
     </div>
-    <div style="width: 80%; float: left;">
+    <div style="width: 20%; float: left;">
+      <h4>Banco de Dados</h4>
       <textarea id="database" rows="10"></textarea>
       <br>
       <button onClick="updateDatabaseFromInput()">Atualizar banco de dados!</button>
+    </div>
+    <div style="width: 50%; float: left;">
+      <h4>Ajuda</h4>
+      - A notação utilizada para input é a pós-fixada!
       <br>
-      <span id="currentDatabase"></span>
+      <br>
+      <div style="width: 50%; float: left;">
+        <table class="table border text-center">
+          <thead>
+            <th scope="col">Operador</th>
+            <th scope="col">Caractere Correspondente</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>¬</td>
+              <td>!</td>
+            </tr>
+            <tr>
+              <td>∧</td>
+              <td>^</td>
+            </tr>
+            <tr>
+              <td>∨</td>
+              <td>U</td>
+            </tr>
+            <tr>
+              <td>→</td>
+              <td>></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="width: 50%; float: left; padding-left: 1em;">
+        <table class="table border text-center">
+          <thead>
+            <th scope="col">Expressão</th>
+            <th scope="col">Input Correspondente</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>¬p</td>
+              <td>p!</td>
+            </tr>
+            <tr>
+              <td>p ∧ q</td>
+              <td>qp^</td>
+            </tr>
+            <tr>
+              <td>p → q</td>
+              <td>qp></td>
+            </tr>
+            <tr>
+              <td>(p ∨ ¬r) → q</td>
+              <td>qr!pU></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
   <!--Lógica do Programa-->
