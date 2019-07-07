@@ -10,7 +10,7 @@
   <body>
     <div class="p-2">
       <h1>Lógica em Programação 2019.1 - Trabalho 1</h1>
-      <h2>Lógica Multimodal</h2> 
+      <h2>Lógica Epistêmica (de anúncios públicos)</h2> 
       <br>
       <b>Professor</b>: Mário Benevides
       <br>
@@ -65,12 +65,16 @@
                   <td>></td>
                 </tr>
                 <tr>
-                  <td>□<sub>k</sub></td>
-                  <td>{*k}</td>
+                  <td>K<sub>n</sub></td>
+                  <td>{*n}</td>
                 </tr>
                 <tr>
-                  <td>◇<sub>k</sub></td>
-                  <td>{?k}</td>
+                  <td>B<sub>n</sub></td>
+                  <td>{?n}</td>
+                </tr>
+                <tr>
+                  <td>[]</td>
+                  <td>@</td>
                 </tr>
               </tbody>
               <thead>
@@ -95,12 +99,20 @@
                   <td>qr!pU></td>
                 </tr>
                 <tr>
-                  <td>□<sub>a</sub>(◇<sub>b</sub>p)</td>
+                  <td>K<sub>a</sub>(B<sub>b</sub>p)</td>
                   <td>p{?b}{*a}</td>
                 </tr>
                 <tr>
-                  <td>□<sub>a</sub>p → □<sub>b</sub>(□<sub>c</sub>p)</td>
+                  <td>K<sub>a</sub>p → K<sub>b</sub>(K<sub>c</sub>p)</td>
                   <td>p{*c}{*b}p{*a}></td>
+                </tr>
+                <tr>
+                  <td>[p]q</td>
+                  <td>qp@</td>
+                </tr>
+                <tr>
+                  <td>[p](p ∧ q)</td>
+                  <td>pq^p@</td>
                 </tr>
               </tbody>
             </table>
