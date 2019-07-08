@@ -21,8 +21,10 @@ ASSIGN
     next(id) := agent_id;
     next(msg_with) :=
         case
+            -- Mensagem está comigo e não é pra mim, portanto ponho ela no 'ar'
             msg_with = id & msg_destinatario != id:
                 nil;
+            -- Mensagem está no 'ar' e é pra mim, portanto pego ela pra mim
             msg_with = nil & msg_destinatario = id:
                 id;
             TRUE:
@@ -30,6 +32,8 @@ ASSIGN
         esac;
     next(msg_destinatario) :=
         case
+            -- Mensagem está comigo e é pra mim, portanto envio uma resposta para o remetente
+            -- (o remetente é o novo destinatário)
             msg_with = id & msg_destinatario = id:
                 msg_remetente;
             TRUE:
@@ -37,6 +41,8 @@ ASSIGN
         esac;
     next(msg_remetente) :=
         case
+            -- Mensagem está comigo e é pra mim, portanto envio uma resposta para o remetente
+            -- (sou o novo remetente)
             msg_with = id & msg_destinatario = id:
                 id;
             TRUE:

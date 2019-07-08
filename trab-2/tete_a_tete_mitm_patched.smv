@@ -1,33 +1,51 @@
 -- Módulo: MAIN
 MODULE main
 VAR
+    -- Com quem está a mensagem ('nil' significa que a mensagem está 'no ar', e pode ser interceptada)
     msg_with:         {nil, a, b, z};
+    -- Quem é o remetente da mensagem
     msg_remetente:    {a, b, z};
+    -- Quem é o destinatário da mensagem
     msg_destinatario: {a, b, z};
+    -- Com qual chave pública a mensagem está encriptada ('nil' significa que a mensagem está decriptada)
     msg_encriptada:   {nil, a, b, z};
+    -- Quem é o remetente interno encriptado dentro da mensagem
     msg_remetente_interno: {nil, a, b, z};
 
     agente_A: process agente(a, msg_with, msg_remetente, msg_destinatario, msg_encriptada, msg_remetente_interno);
     agente_B: process agente(b, msg_with, msg_remetente, msg_destinatario, msg_encriptada, msg_remetente_interno);
     agente_Z: process intruso(z, msg_with, msg_remetente, msg_destinatario, msg_encriptada, msg_remetente_interno);
 ASSIGN
-    init(msg_with)         := a;
-    init(msg_remetente)    := a;
+    init(msg_with)              := a;
+    init(msg_remetente)         := a;
+    init(msg_destinatario)      := b;
+    init(msg_encriptada)        := nil;
     init(msg_remetente_interno) := nil;
-    init(msg_destinatario) := b;
-    init(msg_encriptada)   := nil;
 
--- Módulo: AGENTES
+-- Módulo: AGENTE
 MODULE agente(agent_id, msg_with, msg_remetente, msg_destinatario, msg_encriptada, msg_remetente_interno)
 VAR
     id: {a, b, z};
+    read_msg: boolean;
 ASSIGN
     init(id) := agent_id;
     next(id) := agent_id;
+    init(read_msg) := FALSE;
+    next(read_msg) :=
+        case
+            -- Se mensagem está comigo e não está encriptada, então eu li a mensagem
+            msg_with = id & msg_encriptada = nil:
+                TRUE;
+            TRUE:
+                read_msg;
+        esac;
     next(msg_with) :=
         case
+            -- Mensagem está comigo e não é pra mim, portanto ponho ela no 'ar'
+            -- (apenas se já tiver sido encriptada)
             msg_with = id & msg_destinatario != id & msg_encriptada != nil:
                 nil;
+            -- Mensagem está no 'ar' e é pra mim, portanto pego ela pra mim
             msg_with = nil & msg_destinatario = id:
                 id;
             TRUE:
@@ -35,6 +53,9 @@ ASSIGN
         esac;
     next(msg_destinatario) :=
         case
+            -- Mensagem está comigo, é pra mim e não está encriptada, 
+            -- portanto começo a montar uma resposta para o remetente
+            -- (o remetente é o novo destinatário)
             msg_with = id & msg_destinatario = id & msg_encriptada = nil:
                 msg_remetente;
             TRUE:
@@ -42,6 +63,9 @@ ASSIGN
         esac;
     next(msg_remetente) :=
         case
+            -- Mensagem está comigo, é pra mim e não está encriptada, 
+            -- portanto começo a montar uma resposta para o remetente
+            -- (sou o novo remetente)
             msg_with = id & msg_destinatario = id & msg_encriptada = nil:
                 id;
             TRUE:
@@ -49,10 +73,15 @@ ASSIGN
         esac;
     next(msg_encriptada) :=
         case
+            -- Mensagem está comigo, não é pra mim, está decriptada e não tem remetente interno [primeira mensagem]
+            -- portanto, a mensagem será encriptada com a chave pública do destinatário
             msg_with = id & msg_destinatario != id & msg_encriptada = nil & msg_remetente_interno = nil:
                 msg_destinatario;
+            -- Caso exista um remetente interno, então a mensagem será encriptada com a chave pública dele
             msg_with = id & msg_destinatario != id & msg_encriptada = nil & msg_remetente_interno != nil:
                 msg_remetente_interno;
+            -- Mensagem está comigo, é pra mim e está encriptada com minha chave pública,
+            -- portanto a decripto
             msg_with = id & msg_destinatario = id & msg_encriptada = id:
                 nil;
             TRUE:
@@ -60,22 +89,37 @@ ASSIGN
         esac;
     next(msg_remetente_interno) :=
         case
+            -- Mensagem está comigo, não é pra mim e ainda não foi encriptada pra envio,
+            -- portanto me ponho como o remetente interno
             msg_with = id & msg_destinatario != id & msg_encriptada = nil:
                 id;
             TRUE:
                 msg_remetente_interno;
         esac;
 
+-- Módulo: INTRUSO
 MODULE intruso(agent_id, msg_with, msg_remetente, msg_destinatario, msg_encriptada, msg_remetente_interno)
 VAR
     id: {a, b, z};
+    read_msg: boolean;
 ASSIGN
     init(id) := agent_id;
     next(id) := agent_id;
+    init(read_msg) := FALSE;
+    next(read_msg) :=
+        case
+            msg_with = id & msg_encriptada = nil:
+                TRUE;
+            TRUE:
+                read_msg;
+        esac;
     next(msg_with) :=
         case
+            -- Mensagem está comigo e não é pra mim, portanto ponho ela no 'ar'
+            -- (apenas se já tiver sido encriptada e eu já tiver trocado o remetente)
             msg_with = id & msg_destinatario != id & msg_encriptada != nil & msg_remetente = id:
                 nil;
+            -- Mensagem está no ar e não fui eu que enviei, portanto posso interceptá-la
             msg_with = nil & msg_remetente != id:
                 id;
             TRUE:
@@ -83,6 +127,9 @@ ASSIGN
         esac;
     next(msg_destinatario) :=
         case
+            -- Mensagem está comigo e é pra mim, 
+            -- portanto começo a montar uma resposta para o remetente
+            -- (o remetente é o novo destinatário)
             msg_with = id & msg_destinatario = id:
                 msg_remetente;
             TRUE:
@@ -90,13 +137,20 @@ ASSIGN
         esac;
     next(msg_remetente) :=
         case
+            -- Mensagem está comigo e é pra mim, 
+            -- portanto começo a montar uma resposta para o remetente
+            -- (eu sou o novo remetente)
             msg_with = id & msg_destinatario = id:
                 id;
+            -- Mensagem está comigo e não é pra mim (interceptada), 
+            -- portanto começo a montar uma resposta para o remetente
+            -- (eu sou o novo remetente)
             msg_with = id & msg_destinatario != id & msg_remetente != id:
                 id;
             TRUE:
                 msg_remetente;
         esac;
+    -- Mesmas regras de criptografia que um agente
     next(msg_encriptada) :=
         case
             msg_with = id & msg_destinatario != id & msg_encriptada = nil:

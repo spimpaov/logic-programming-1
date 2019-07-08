@@ -18,13 +18,26 @@ ASSIGN
 MODULE agente(agent_id, msg_with, msg_remetente, msg_destinatario, msg_encriptada)
 VAR
     id: {a, b};
+    read_msg: boolean;
 ASSIGN
     init(id) := agent_id;
     next(id) := agent_id;
+    init(read_msg) := FALSE;
+    next(read_msg) :=
+        case
+            -- Se mensagem está comigo e não está encriptada, eu li a mensagem
+            msg_with = id & msg_encriptada = nil:
+                TRUE;
+            TRUE:
+                read_msg;
+        esac;
     next(msg_with) :=
         case
+            -- Mensagem está comigo e não é pra mim, portanto ponho ela no 'ar'
+            -- (apenas se já tiver sido encriptada)
             msg_with = id & msg_destinatario != id & msg_encriptada != nil:
                 nil;
+            -- Mensagem está no 'ar' e é pra mim, portanto pego ela pra mim
             msg_with = nil & msg_destinatario = id:
                 id;
             TRUE:
@@ -32,6 +45,9 @@ ASSIGN
         esac;
     next(msg_destinatario) :=
         case
+            -- Mensagem está comigo, é pra mim e não está encriptada, 
+            -- portanto começo a montar uma resposta para o remetente
+            -- (o remetente é o novo destinatário)
             msg_with = id & msg_destinatario = id & msg_encriptada = nil:
                 msg_remetente;
             TRUE:
@@ -39,6 +55,9 @@ ASSIGN
         esac;
     next(msg_remetente) :=
         case
+            -- Mensagem está comigo, é pra mim e não está encriptada, 
+            -- portanto começo a montar uma resposta para o remetente
+            -- (sou o novo remetente)
             msg_with = id & msg_destinatario = id & msg_encriptada = nil:
                 id;
             TRUE:
@@ -46,8 +65,12 @@ ASSIGN
         esac;
     next(msg_encriptada) :=
         case
+            -- Mensagem está comigo, não é pra mim, e não está encriptada,
+            -- portanto encripto a mensagem com a chave pública do destinatário
             msg_with = id & msg_destinatario != id & msg_encriptada = nil:
                 msg_destinatario;
+            -- Mensagem está comigo, é pra mim e está encriptada com minha chave pública,
+            -- portanto decripto a mensagem com a minha chave privada
             msg_with = id & msg_destinatario = id & msg_encriptada = id:
                 nil;
             TRUE:
