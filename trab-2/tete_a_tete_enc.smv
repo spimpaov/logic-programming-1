@@ -1,0 +1,55 @@
+-- Módulo: MAIN
+MODULE main
+VAR
+    msg_with:         {nil, a, b};
+    msg_remetente:    {a, b};
+    msg_destinatario: {a, b};
+    msg_encriptada:   {nil, a, b};
+
+    agente_A: process agente(a, msg_with, msg_remetente, msg_destinatario, msg_encriptada);
+    agente_B: process agente(b, msg_with, msg_remetente, msg_destinatario, msg_encriptada);
+ASSIGN
+    init(msg_with)         := a;
+    init(msg_remetente)    := a;
+    init(msg_destinatario) := b;
+    init(msg_encriptada)   := nil;
+
+-- Módulo: AGENTES
+MODULE agente(agent_id, msg_with, msg_remetente, msg_destinatario, msg_encriptada)
+VAR
+    id: {a, b};
+ASSIGN
+    init(id) := agent_id;
+    next(id) := agent_id;
+    next(msg_with) :=
+        case
+            msg_with = id & msg_destinatario != id & msg_encriptada != nil:
+                nil;
+            msg_with = nil & msg_destinatario = id:
+                id;
+            TRUE:
+                msg_with;
+        esac;
+    next(msg_destinatario) :=
+        case
+            msg_with = id & msg_destinatario = id & msg_encriptada = nil:
+                msg_remetente;
+            TRUE:
+                msg_destinatario;
+        esac;
+    next(msg_remetente) :=
+        case
+            msg_with = id & msg_destinatario = id & msg_encriptada = nil:
+                id;
+            TRUE:
+                msg_remetente;
+        esac;
+    next(msg_encriptada) :=
+        case
+            msg_with = id & msg_destinatario != id & msg_encriptada = nil:
+                msg_destinatario;
+            msg_with = id & msg_destinatario = id & msg_encriptada = id:
+                nil;
+            TRUE:
+                msg_encriptada;
+        esac;
