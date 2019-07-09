@@ -1,7 +1,6 @@
 # Lógica em Programação 2019.1
 
-**Professor**: Mario Benevides
-
+**Professor**: Mario Benevides  
 **Estudantes**: Silvia Pimpão e Vinícius Garcia
 
 ---
