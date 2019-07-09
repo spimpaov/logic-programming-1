@@ -1,3 +1,4 @@
+// [INPUT] Calcula a expressão definida em $("#input")
 function calculateBasedOnUserInput() {
   var input = document.getElementById('input').value;
   var result = calculate_input(input);
@@ -18,6 +19,7 @@ function calculateBasedOnUserInput() {
   handleFadeInEffect();
 }
 
+// [INPUT] Atualiza o banco de dados a partir do input
 function updateDatabaseFromInput() {
   var states_input = document.getElementById('states').value;
   var relations_input = document.getElementById('relations').value;
@@ -29,11 +31,13 @@ function updateDatabaseFromInput() {
   updateGraphVisualization(database.states, database.relations);
 }
 
+// [VISUALIZAÇÃO] Atualiza o <span> com o banco de dados
 function updateDatabaseSpan(states, relations) {
   document.getElementById('states').value = states;
   document.getElementById('relations').value = relations;
 }
 
+// [VISUALIZAÇÃO] Função auxiliar de visualização de grafo
 function getStateLabel(state) {
   var string = "<b>" + state.name + "</b>: ("
   
@@ -46,6 +50,7 @@ function getStateLabel(state) {
   return string;
 }
 
+// [VISUALIZAÇÃO] Atualiza a visualização do grafo (feito com Mermaid)
 function updateGraphVisualization(states, relations) {
   var string = "graph TD\n";
   relations.forEach((relation) => {
@@ -68,6 +73,7 @@ function updateGraphVisualization(states, relations) {
   mermaid.init(undefined, "#graph_visualization");
 }
 
+// [COSMÉTICO] Função de Fade-in
 function handleFadeInEffect() {
   document.getElementById('result').className = "";
   setTimeout(function() {

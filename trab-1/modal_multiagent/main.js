@@ -213,7 +213,7 @@ function get_operator(operation) {
   return operators.find((f) => operation.search(f.pattern) != -1);
 }
 
-// Obtém string 
+// Obtém string referente ao operador/operando atual
 function get_op_string(array, index, forwards = true) {
   var op_string = array[index];
 
