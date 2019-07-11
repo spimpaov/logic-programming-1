@@ -14,3 +14,6 @@ Implementar verificadores de expressões de lógicas variadas. Soluções podem 
 
 **Trabalho 2**:  
 Implementação e verificação do modelo de Dolev-Yao para três agentes A, B e Z, onde Z é um intruso. Utilizar NuSMV para provar logicamente a falha de segurança explorada no Man-in-the-Middle; similarmente, provar a correção do protocolo. Soluções podem ser acessadas [aqui](./trab-2/).
+
+**Extra**:
+Verificador de bissimulação entre modelos. Dois modelos são ditos *bissimilares* se produzem comportamentos idênticos para um observador externo que desconhece suas diferenças interiores. O verificador pode ser acessado [aqui](https://vgarciasc.github.io/logic-programming).
