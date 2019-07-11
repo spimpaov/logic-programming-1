@@ -1,0 +1,80 @@
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet"	 href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap"> 
+	<link rel="stylesheet" href="../../styles.css">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<title>Lógica em Programação</title>
+</head>
+<body>
+	<div class="p-2">
+		<h1>Lógica em Programação 2019.1</h1>
+		<h2>Verificador de Bissimulação</h2>
+
+		<div class="row">
+			<div class="col-8">
+				<div class="row">
+					<div class="col-6">
+						<div class="row">
+							<div class="col-6">
+								<h4>Modelo M</h4>
+								<textarea class="w-100" id="model_M" rows="10"></textarea>
+							</div>
+							<div class="col-6">
+								<div class="pt-4" id="graph_visualization_model_0" class="mermaid">
+								</div>
+							</div>
+						</div>
+						<br>
+						<button onClick="updateModels(0)">Carregar modelo!</button>
+					</div>
+					<div class="col-6">
+						<div class="row">
+							<div class="col-6">
+								<h4>Modelo N</h4>
+								<textarea class="w-100" id="model_N" rows="10"></textarea>
+							</div>
+							<div class="col-6">
+								<div class="pt-4" id="graph_visualization_model_1" class="mermaid">
+								</div>
+							</div>
+						</div>
+						<br>
+						<button onClick="updateModels(1)">Carregar modelo!</button>
+					</div>
+					<div class="py-4 col-12 bg-light">
+						<h4>Informações</h4>
+						- A raiz será o primeiro estado a ser definido!<br>
+						- Para carregar um exemplo, clique nos números abaixo:<br>
+						<b>&nbsp;&nbsp;Exemplos: </b>
+						(
+							<a onclick="loadExample(0)" href="#">1</a> | 
+							<a onclick="loadExample(1)" href="#">2</a> |
+							<a onclick="loadExample(2)" href="#">3</a> |
+							<a onclick="loadExample(3)" href="#">4</a> |
+							<a onclick="loadExample(4)" href="#">5</a>
+						)
+					</div>
+				</div>
+			</div>
+			<div class="col-4">
+				<h4>Resultado</h5>
+				<button onClick="runAlgorithm()">Executar!</button>
+				<span id="execution_tale" style="font-family: 'Roboto Mono', monospace;"></span>
+			</div>
+		</div>
+	</div>
+	
+	<!--Lógica do Programa-->
+	<script type="text/javascript" src="built/main.js"></script>
+	<!--Funções Auxiliares de HTML-->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.0.0/mermaid.min.js"></script>
+	<!-- <script type="module" src="built/html_helper.js"></script> -->
+	<script>
+		updateModelsSpan(JSON.stringify(model_M_json, null, 4), JSON.stringify(model_N_json, null, 4));
+		updateModels(0);
+		updateModels(1);
+	</script>
+</body>
